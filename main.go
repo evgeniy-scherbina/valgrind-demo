@@ -20,7 +20,7 @@ func memoryLeak(n int) {
 	}
 }
 
-func rocksdb(n int) {
+func rocksdb(n int, infinite bool) {
 	bbto := grocksdb.NewDefaultBlockBasedTableOptions()
 	cache := grocksdb.NewLRUCache(1 << 30)
 	bbto.SetBlockCache(cache)
@@ -37,10 +37,10 @@ func rocksdb(n int) {
 	}
 	_ = db
 
-	simulateLoad(db, n)
+	simulateLoad(db, n, infinite)
 }
 
-func simulateLoad(db *grocksdb.DB, n int) {
+func simulateLoad(db *grocksdb.DB, n int, infinite bool) {
 	ro := grocksdb.NewDefaultReadOptions()
 	wo := grocksdb.NewDefaultWriteOptions()
 
@@ -53,7 +53,7 @@ func simulateLoad(db *grocksdb.DB, n int) {
 		log.Fatal(err)
 	}
 
-	for i := 0; i < n; i++ {
+	for i := 0; i < n || infinite; i++ {
 		value, err := db.Get(ro, defaultKey)
 		if err != nil {
 			log.Fatal(err)
@@ -66,6 +66,7 @@ func simulateLoad(db *grocksdb.DB, n int) {
 func main() {
 	n := flag.Int("n", 0, "")
 	delay := flag.Int("delay", 0, "")
+	infinite := flag.Bool("infinite", false, "")
 	flag.Parse()
 
 	fmt.Printf("delay start\n")
@@ -75,6 +76,6 @@ func main() {
 	fmt.Printf("start\n")
 	fmt.Printf("n: %v\n", *n)
 	//memoryLeak(*n)
-	rocksdb(*n)
+	rocksdb(*n, *infinite)
 	fmt.Printf("end\n")
 }
