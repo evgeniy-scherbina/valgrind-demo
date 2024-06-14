@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 void f(void)
 {
@@ -8,6 +9,8 @@ void f(void)
 
 int main(void)
 {
+  printf("start\n");
   f();
+  printf("end\n");
   return 0;
 }
